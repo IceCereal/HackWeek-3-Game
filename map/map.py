@@ -1,35 +1,62 @@
-import pygame
-from argparse import ArgumentParser
+import contextlib
+with contextlib.redirect_stdout(None):
+	import pygame
+
+import numpy as np
 
 class map:
-	def __init__(self, verbose : bool = None):
+	def __init__(self, image : np.array, pixelSize : int, verbose : bool = None,):
 		if verbose == None:
 			verbose = False
 		self.verbose = verbose
 
-	def make_grid(self, width : int, height : int):
-		if self.verbose:
-			print ("Making Grid of Dimensions:\t", width, "w\t", height, "h...")
-
-		map_pixel = {
-			'color' : 0,
-			'extras' : {}
-		}
-
-		self.grid = [[map_pixel for i in range(width)] for j in range(height)]
+		self.pixelSize = pixelSize
+		self.height = 0
+		self.width = 0
+		self.reference_colors = []
+		self.grid = []
 
 		if self.verbose:
-			print ("Complete Making Grid!")
+			print ("\nStart: Making Grid...")
+		self.make_grid(image, pixelSize)
 
+	def make_grid(self, image : np.array, pixelSize : int):
+		(width, height, depth) = image.shape
+		reference_colors = []
 
-if __name__ == "__main__":
-	parser = ArgumentParser()
+		self.width = int(width / pixelSize)
+		self.height = int(height / pixelSize)
 
-	parser.add_argument('-wd', "--width", required=True, type=int, help="Width of the image")
-	parser.add_argument('-ht', "--height", required=True, type=int, help="Height of the image")
-	parser.add_argument('-v', "--verbose", required=False, action='store_true', help="Verbosity")
+		for line in range(0, width, pixelSize):
+			compressed_line = []
+			for pixelUnit in range(0, height, pixelSize):
+				try:
+					if str(image[line][pixelUnit]) not in reference_colors:
+						if self.verbose:
+							print ("Found New Color:\t", str(image[line][pixelUnit]))
 
-	opt = parser.parse_args()
+						reference_colors.append(str(image[line][pixelUnit]))
+						self.reference_colors.append(tuple(image[line][pixelUnit]))
 
-	map = map(opt.verbose)
-	map.make_grid(opt.width, opt.height)
+					pixel = {
+						'color' : reference_colors.index(str(image[line][pixelUnit])),
+						'extra' : {}
+					}
+
+					compressed_line.append(pixel)
+				except IndexError:
+						pass
+			self.grid.append(compressed_line)
+
+		if self.verbose:
+			print ("Complete: Making Grid!")
+			print ("\nGrid Stats:")
+			print ("Width:\t", self.width)
+			print ("Height:\t", self.height)
+			print ("Number of Colors Identified:\t", len(self.reference_colors))
+			print ("Colors Identified:\t", self.reference_colors)
+			print ("\nMap:\n")
+			for line in self.grid:
+				for pixel in line:
+					print (pixel['color'], end=' ')
+				print ("\n", end='')
