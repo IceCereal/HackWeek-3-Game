@@ -13,3 +13,20 @@ opt = parser.parse_args()
 
 imageArray = Img2Pix(imagePath = opt.imagePath, K_Colors = opt.numColors, pixelSize = opt.pixelSize, verbose = opt.verbose)
 map = map(image = imageArray, pixelSize = opt.pixelSize, verbose = opt.verbose)
+import pygame
+pygame.init()
+window = pygame.display.set_mode(((map.height+2)*map.pixelSize, (map.width+2)*map.pixelSize))
+background_color = (255, 255, 255)
+window.fill(background_color)
+print (map.height, map.width, map.pixelSize)
+for y in range(0, map.height+2):
+	for x in range(0, map.width+2):
+		rect = pygame.Rect(y*map.pixelSize, x*map.pixelSize, map.pixelSize, map.pixelSize)
+		if (map.grid[x][y]['color'] == -1):
+			pygame.draw.rect(window, (0, 0, 0), rect)
+		else:
+			pygame.draw.rect(window, tuple(map.reference_colors_values[map.grid[x][y]['color']]), rect)
+
+pygame.display.flip()
+
+# a = input()
