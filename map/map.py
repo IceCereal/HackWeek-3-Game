@@ -16,6 +16,8 @@ class map:
 		self.height = 0
 		self.width = 0
 		self.reference_colors = {}
+		self.reference_colors_values = []
+		self.reference_colors_index = []
 
 		self.grid = []
 
@@ -27,7 +29,6 @@ class map:
 
 	def __make_grid(self, image : np.array, pixelSize : int):
 		(width, height, depth) = image.shape
-		self.reference_colors_index = []
 
 		self.width = int(width / pixelSize)
 		self.height = int(height / pixelSize)
@@ -57,6 +58,11 @@ class map:
 			self.grid.append(compressed_line)
 		self.grid.append([{'color': -1, 'extra' : {'wall' : True}} for i in range(self.height+2)])
 
+		from ast import literal_eval as le
+		for color in self.reference_colors_index:
+			color = le(color.replace(" ", ", ", 2))
+			self.reference_colors_values.append(color)
+
 		if self.verbose:
 			print ("Complete: Making Grid!")
 			print ("\nGrid Stats:")
@@ -77,9 +83,9 @@ class map:
 		if self.verbose:
 			print ("Getting most prevalent colors...")
 		
-		a = list(sorted(self.reference_colors.items(), key=operator.itemgetter(1), reverse=True))
+		sorted_colors = list(sorted(self.reference_colors.items(), key=operator.itemgetter(1), reverse=True))
 
-		wall_color = a[-1][0]
+		wall_color = sorted_colors[-1][0]
 		wall_color = str(list(wall_color)).replace(",", '', 3)
 		wall_color_index = self.reference_colors_index.index(wall_color)
 
@@ -87,3 +93,6 @@ class map:
 			for pixel in line:
 				if pixel['color'] == wall_color_index:
 					pixel['extra']['wall'] = True
+	
+		self.startPoint = (1, 1)
+		self.endPoint = (self.height-2, self.width-2)
