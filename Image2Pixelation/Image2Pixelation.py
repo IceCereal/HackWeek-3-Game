@@ -1,6 +1,7 @@
 from PIL import Image
 import numpy as np
 import cv2
+from os import path
 
 def Img2Pix(imagePath : str, K_Colors : int, pixelSize : int, verbose : bool = None):
 	if verbose:
@@ -8,15 +9,21 @@ def Img2Pix(imagePath : str, K_Colors : int, pixelSize : int, verbose : bool = N
 		print ("Image at:\t", imagePath)
 		print ("K_Colors:\t", K_Colors)
 		print ("Pixel Size:\t", pixelSize)
-	
-	dest_Path = imagePath[0:imagePath.index('.')] + "_pixelated" + imagePath[imagePath.index('.'):]
+
+	file_name, ext = path.splitext(imagePath)
+	dest_Path = file_name + "_pixelated.png"
+
+	img = Image.open(imagePath)
+	size = 1000, 800
+	img.thumbnail(size)
+	img.save(dest_Path)
 
 	if verbose:
 		print ("\nStart: Segmentation...")
 	"""
 		Segmentation
 	"""
-	img = cv2.imread(imagePath)
+	img = cv2.imread(dest_Path)
 	Z = img.reshape((-1,3))
 
 	Z = np.float32(Z)
