@@ -1,7 +1,3 @@
-import contextlib
-with contextlib.redirect_stdout(None):
-	import pygame
-
 import numpy as np
 from collections import OrderedDict
 import operator
@@ -16,8 +12,9 @@ class map:
 		self.height = 0
 		self.width = 0
 		self.reference_colors = {}
-		self.reference_colors_values = []
 		self.reference_colors_index = []
+		self.startPoint = (0, 0)
+		self.endPoint = (0, 0)
 
 		self.grid = []
 
@@ -38,15 +35,21 @@ class map:
 			compressed_line = [{'color': -1, 'extra' : {'wall' : True}}]
 			for pixelUnit in range(0, height, pixelSize):
 				try:
-					if str(image[line][pixelUnit]) not in self.reference_colors_index:
+					color = str(image[line][pixelUnit])
+					if color[1] == ' ':
+						color = color.replace(' ', '', 1)
+					color = color.replace("  ", " ", 10)
+					color = color.replace(" ", ", ", 10)
+					
+					if color not in self.reference_colors_index:
 						if self.verbose:
-							print ("Found New Color:\t", str(image[line][pixelUnit]))
+							print ("Found New Color:\t", color)
 
-						self.reference_colors_index.append(str(image[line][pixelUnit]))
+						self.reference_colors_index.append(color)
 						self.reference_colors[tuple(image[line][pixelUnit])] = 0
 
 					pixel = {
-						'color' : self.reference_colors_index.index(str(image[line][pixelUnit])),
+						'color' : self.reference_colors_index.index(color),
 						'extra' : {}
 					}
 					self.reference_colors[tuple(image[line][pixelUnit])] += 1
@@ -57,11 +60,6 @@ class map:
 			compressed_line.append({'color': -1, 'extra' : {'wall' : True}})
 			self.grid.append(compressed_line)
 		self.grid.append([{'color': -1, 'extra' : {'wall' : True}} for i in range(self.height+2)])
-
-		from ast import literal_eval as le
-		for color in self.reference_colors_index:
-			color = le(color.replace(" ", ", ", 2))
-			self.reference_colors_values.append(color)
 
 		if self.verbose:
 			print ("Complete: Making Grid!")
@@ -84,10 +82,9 @@ class map:
 			print ("Getting most prevalent colors...")
 		
 		sorted_colors = list(sorted(self.reference_colors.items(), key=operator.itemgetter(1), reverse=True))
-
+		
 		wall_color = sorted_colors[-1][0]
-		wall_color = str(list(wall_color)).replace(",", '', 3)
-		wall_color_index = self.reference_colors_index.index(wall_color)
+		wall_color_index = self.reference_colors_index.index(str(list(wall_color)))
 
 		for line in self.grid:
 			for pixel in line:
@@ -95,4 +92,4 @@ class map:
 					pixel['extra']['wall'] = True
 	
 		self.startPoint = (1, 1)
-		self.endPoint = (self.height-2, self.width-2)
+		self.endPoint = (self.height, self.width)
