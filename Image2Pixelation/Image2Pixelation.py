@@ -61,5 +61,5 @@ def Img2Pix(imagePath : str, K_Colors : int, pixelSize : int, verbose : bool = N
 		print ("Complete: Pixelation!")
 
 	if verbose:
-		print ("\nReturning: Numpy Array of Img2Pix(", imagePath, ")")
+		print ("\nReturning: Numpy Array of Img2Pix(", dest_Path, ")")
 	return np.array(image)

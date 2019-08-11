@@ -74,7 +74,7 @@ def loop():
 		rect = pygame.Rect(me_y*map.pixelSize, me_x*map.pixelSize, map.pixelSize, map.pixelSize)
 		pygame.draw.rect(window, (255, 0, 0), rect)
 		pygame.display.update()
-		clock.tick(45)
+		clock.tick(25)
 
 if __name__ == "__main__":
 	loop()
