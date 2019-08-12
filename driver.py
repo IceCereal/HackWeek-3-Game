@@ -21,9 +21,35 @@ imageArray = Img2Pix(imagePath = opt.imagePath, K_Colors = opt.numColors, pixelS
 map = map(image = imageArray, pixelSize = opt.pixelSize, verbose = opt.verbose)
 
 pygame.init()
-window = pygame.display.set_mode(((map.height+2)*map.pixelSize, (map.width+2)*map.pixelSize))
+window = pygame.display.set_mode((7*map.pixelSize*5, 7*map.pixelSize*5))
 background_color = (255, 255, 255)
 window.fill(background_color)
+
+def disp(me_x, me_y):
+	a = [[0, 0, 0, 0, 0, 0, 0, 0] for i in range(8)]
+	for y in range(0, 8):
+		for x in range(0, 8):
+			yC = me_y - 3 + y
+			xC = me_x - 3 + x
+
+			try:
+				a[y][x] = tuple(literal_eval(map.reference_colors_index[map.grid[xC][yC]['color']]))
+			except IndexError:
+				a[y][x] = (0, 0, 0)
+
+			if (yC == map.startPoint[1]) and (xC == map.startPoint[0]):
+				a[y][x] = (255, 255, 0)
+			if (xC == map.endPoint[1]) and (yC == map.endPoint[0]):
+				a[y][x] = (255, 255, 0)
+	a[3][3] = (255, 0, 0)
+
+	for y in range(0, 8):
+		for x in range(0, 8):
+			rect = pygame.Rect(y*map.pixelSize*5, x*map.pixelSize*5, map.pixelSize*5, map.pixelSize*5)
+			pygame.draw.rect(window, a[y][x], rect)
+
+	return
+
 
 def loop():
 	clock = pygame.time.Clock()
@@ -48,19 +74,7 @@ def loop():
 				if event.key == pygame.K_DOWN:
 					queue_x = 1
 
-		for y in range(0, map.height+2):
-			for x in range(0, map.width+2):
-				rect = pygame.Rect(y*map.pixelSize, x*map.pixelSize, map.pixelSize, map.pixelSize)
-				if (map.grid[x][y]['color'] == -1):
-					pygame.draw.rect(window, (0, 0, 0), rect)
-				else:
-					pygame.draw.rect(window, tuple(literal_eval(map.reference_colors_index[map.grid[x][y]['color']])), rect)
-
-		rect = pygame.Rect(map.startPoint[1]*map.pixelSize, map.startPoint[0]*map.pixelSize, map.pixelSize, map.pixelSize)
-		pygame.draw.rect(window, (40, 40, 100), rect)
-
-		rect = pygame.Rect(map.endPoint[0]*map.pixelSize, map.endPoint[1]*map.pixelSize, map.pixelSize, map.pixelSize)
-		pygame.draw.rect(window, (255, 255, 0), rect)
+		disp(me_x, me_y)
 
 		if map.grid[me_x + queue_x][me_y + queue_y]['color'] != -1:
 			try:
@@ -70,8 +84,6 @@ def loop():
 				me_x += queue_x
 				me_y += queue_y
 
-		rect = pygame.Rect(me_y*map.pixelSize, me_x*map.pixelSize, map.pixelSize, map.pixelSize)
-		pygame.draw.rect(window, (255, 0, 0), rect)
 		pygame.display.update()
 		clock.tick(25)
 
