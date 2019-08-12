@@ -1,6 +1,8 @@
 import numpy as np
 from collections import OrderedDict
 import operator
+from random import randint
+from time import sleep
 
 class map:
 	def __init__(self, image : np.array, pixelSize : int, verbose : bool = None,):
@@ -91,5 +93,6 @@ class map:
 				if pixel['color'] == wall_color_index:
 					pixel['extra']['wall'] = True
 	
-		self.startPoint = (1, 1)
-		self.endPoint = (self.height, self.width)
+		self.startPoint = (1, randint(1, self.height))
+		sleep( (randint(1, 1000)%5) / 5)
+		self.endPoint = (randint(1, self.height), self.width)

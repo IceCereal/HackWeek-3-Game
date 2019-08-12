@@ -24,7 +24,6 @@ pygame.init()
 window = pygame.display.set_mode(((map.height+2)*map.pixelSize, (map.width+2)*map.pixelSize))
 background_color = (255, 255, 255)
 window.fill(background_color)
-print (map.height, map.width, map.pixelSize)
 
 def loop():
 	clock = pygame.time.Clock()
@@ -61,7 +60,7 @@ def loop():
 		pygame.draw.rect(window, (40, 40, 100), rect)
 
 		rect = pygame.Rect(map.endPoint[0]*map.pixelSize, map.endPoint[1]*map.pixelSize, map.pixelSize, map.pixelSize)
-		pygame.draw.rect(window, (40, 40, 100), rect)
+		pygame.draw.rect(window, (255, 255, 0), rect)
 
 		if map.grid[me_x + queue_x][me_y + queue_y]['color'] != -1:
 			try:
@@ -75,6 +74,10 @@ def loop():
 		pygame.draw.rect(window, (255, 0, 0), rect)
 		pygame.display.update()
 		clock.tick(25)
+
+		if (me_x == map.endPoint[1]) and (me_y == map.endPoint[0]):
+			print ("DONE")
+			break
 
 if __name__ == "__main__":
 	loop()
