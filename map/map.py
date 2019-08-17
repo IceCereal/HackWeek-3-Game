@@ -14,8 +14,8 @@ class map:
 		self.pixelSize = pixelSize
 		self.height = 0
 		self.width = 0
-		self.reference_colors = {}
-		self.reference_colors_index = []
+		self.reference_colors_data = {}
+		self.reference_colors = []
 		self.startPoint = (0, 0)
 		self.endPoint = (0, 0)
 		self.keyPoint = (0, 0)
@@ -53,38 +53,38 @@ class map:
 					color = literal_eval(color)
 					color = tuple(color)
 
-					if color not in self.reference_colors_index:
+					if color not in self.reference_colors:
 						if self.verbose:
 							print ("Found New Color:\t", color)
 
-						self.reference_colors_index.append(color)
-						self.reference_colors[tuple(image[line][pixelUnit])] = 0
+						self.reference_colors.append(color)
+						self.reference_colors_data[tuple(image[line][pixelUnit])] = 0
 
-					self.reference_colors[tuple(image[line][pixelUnit])] += 1
+					self.reference_colors_data[tuple(image[line][pixelUnit])] += 1
 				except IndexError:
 					pass
 
 		if self.verbose:
 			print ("Completed getting colors!")
 
-		if (255, 255, 255) not in self.reference_colors_index:
+		if (255, 255, 255) not in self.reference_colors:
 			if self.verbose:
 				print ("\nBrute Adding (256, 256, 256)...")
 
-			self.reference_colors_index.append((256, 256, 256))
-			self.reference_colors[(256, 256, 256)] = (self.height * 4) + (self.width * 4) - 16
+			self.reference_colors.append((256, 256, 256))
+			self.reference_colors_data[(256, 256, 256)] = (self.height * 4) + (self.width * 4) - 16
 		else:
 			print ("Manual Input Required! Exiting")
 			exit()
 
-		print (self.reference_colors)
-		print ("\n", self.reference_colors_index)
+		print (self.reference_colors_data)
+		print ("\n", self.reference_colors)
 
 		if self.verbose:
 			print ("Getting most prevalent colors...")
 
 		# Determine the wall's color
-		sorted_colors = list(sorted(self.reference_colors.items(), key=operator.itemgetter(1), reverse=True))
+		sorted_colors = list(sorted(self.reference_colors_data.items(), key=operator.itemgetter(1), reverse=True))
 		wall_color = sorted_colors[-1][0]
 
 		if self.verbose:
@@ -99,7 +99,7 @@ class map:
 			for boundaryUnit in range(0, self.width + 4):
 				color = (256, 256, 256)
 				pixel = {
-					'color' : self.reference_colors_index.index(color),
+					'color' : self.reference_colors.index(color),
 					'extras' : {
 							'wall' : True,
 							'boundary' : True
@@ -115,7 +115,7 @@ class map:
 			for boundaryUnit in range(2):
 				color = (256, 256, 256)
 				pixel = {
-					'color' : self.reference_colors_index.index(color),
+					'color' : self.reference_colors.index(color),
 					'extras' : {
 							'wall' : True,
 							'boundary' : True
@@ -138,7 +138,7 @@ class map:
 					isWall = True
 
 				pixel = {
-					'color' : self.reference_colors_index.index(color),
+					'color' : self.reference_colors.index(color),
 					'extras' : {
 							'wall' : isWall,
 							'boundary' : False
@@ -150,7 +150,7 @@ class map:
 			for boundaryUnit in range(2):
 				color = (256, 256, 256)
 				pixel = {
-					'color' : self.reference_colors_index.index(color),
+					'color' : self.reference_colors.index(color),
 					'extras' : {
 							'wall' : True,
 							'boundary' : True
@@ -166,7 +166,7 @@ class map:
 			for boundaryUnit in range(0, self.width + 4):
 				color = (256, 256, 256)
 				pixel = {
-					'color' : self.reference_colors_index.index(color),
+					'color' : self.reference_colors.index(color),
 					'extras' : {
 							'wall' : True,
 							'boundary' : True
@@ -180,8 +180,8 @@ class map:
 			print ("\nGrid Stats:")
 			print ("Width:\t", self.width)
 			print ("Height:\t", self.height)
-			print ("Number of Colors Identified:\t", len(self.reference_colors))
-			print ("Colors Identified:\t", self.reference_colors)
+			print ("Number of Colors Identified:\t", len(self.reference_colors_data))
+			print ("Colors Identified:\t", self.reference_colors_data)
 			print ("\nMap:\n")
 			for line in self.grid:
 				for pixel in line:
