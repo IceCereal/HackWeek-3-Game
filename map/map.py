@@ -19,6 +19,7 @@ class map:
 		self.startPoint = (0, 0)
 		self.endPoint = (0, 0)
 		self.keyPoint = (0, 0)
+		self.wallColor = (0, 0, 0)
 
 		self.grid = []
 
@@ -67,18 +68,15 @@ class map:
 		if self.verbose:
 			print ("Completed getting colors!")
 
-		if (255, 255, 255) not in self.reference_colors:
+		if (0, 0, 0) not in self.reference_colors:
 			if self.verbose:
-				print ("\nBrute Adding (256, 256, 256)...")
+				print ("\nBrute Adding (0, 0, 0)...")
 
-			self.reference_colors.append((256, 256, 256))
-			self.reference_colors_data[(256, 256, 256)] = (self.height * 4) + (self.width * 4) - 16
+			self.reference_colors.append((0, 0, 0))
+			self.reference_colors_data[(0, 0, 0)] = (self.height * 4) + (self.width * 4) - 16
 		else:
 			print ("Manual Input Required! Exiting")
 			exit()
-
-		print (self.reference_colors_data)
-		print ("\n", self.reference_colors)
 
 		if self.verbose:
 			print ("Getting most prevalent colors...")
@@ -86,6 +84,7 @@ class map:
 		# Determine the wall's color
 		sorted_colors = list(sorted(self.reference_colors_data.items(), key=operator.itemgetter(1), reverse=True))
 		wall_color = sorted_colors[-1][0]
+		self.wallColor = wall_color
 
 		if self.verbose:
 			print ("Determined Wall Color:\t", wall_color)
@@ -97,7 +96,7 @@ class map:
 		for line in range(2):
 			tempLine = []
 			for boundaryUnit in range(0, self.width + 4):
-				color = (256, 256, 256)
+				color = (0, 0, 0)
 				pixel = {
 					'color' : self.reference_colors.index(color),
 					'extras' : {
@@ -113,7 +112,7 @@ class map:
 
 			# 2 Boundary units on the left side of the line
 			for boundaryUnit in range(2):
-				color = (256, 256, 256)
+				color = (0, 0, 0)
 				pixel = {
 					'color' : self.reference_colors.index(color),
 					'extras' : {
@@ -148,7 +147,7 @@ class map:
 
 			# 2 Boundary units on the right side of the line
 			for boundaryUnit in range(2):
-				color = (256, 256, 256)
+				color = (0, 0, 0)
 				pixel = {
 					'color' : self.reference_colors.index(color),
 					'extras' : {
@@ -164,7 +163,7 @@ class map:
 		for line in range(2):
 			tempLine = []
 			for boundaryUnit in range(0, self.width + 4):
-				color = (256, 256, 256)
+				color = (0, 0, 0)
 				pixel = {
 					'color' : self.reference_colors.index(color),
 					'extras' : {
@@ -188,6 +187,13 @@ class map:
 					print (pixel['color'], end=' ')
 				print ("\n", end='')
 
+			print ("\n\n\n")
+
+			for line in self.grid:
+				for pixel in line:
+					print (int(pixel['extras']['wall']), end=' ')
+				print ("\n", end='')
+
 	def __set_extra(self):
 		if self.verbose:
 			print ("\nStart: set_extra")
@@ -207,8 +213,11 @@ class map:
 		for i in range(10):
 			setKey()
 
-			if self.grid[self.keyPoint[0]][self.keyPoint[1]]['extras']['wall'] == False:
-				break
+			try:
+				if self.grid[self.keyPoint[0]][self.keyPoint[1]]['extras']['wall'] == False:
+					break
+			except:
+				pass
 
 			if self.verbose:
 				print ("Key Randomized to wall. Key Resetting (Attempt #", i+1, ")...")
